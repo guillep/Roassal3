@@ -931,3 +931,66 @@ RSBlocExamples >> example24AnimationLinesInComposite [
 	canvas when: RSExtentChangedEvent do: [ canvas camera zoomToFit: canvas extent extent: 500 asPoint ].
 	^ canvas
 ]
+
+{ #category : #examples }
+RSBlocExamples >> example25Polygon [
+	<script: 'self new example25Polygon open'>
+
+	| c p |
+	c := RSCanvas new.
+	c useBlocHost.
+
+	p := RSPolygon new
+		points: { 100@10. 40@198. 190@78. 10@78. 160@198 };
+		yourself.
+	p translateTo: 0@0.
+	c addShape: p.
+	
+	^ c
+
+]
+
+{ #category : #examples }
+RSBlocExamples >> example26PolygonCircleWaves [
+	<script: 'self new example26PolygonCircleWaves open'>
+
+	| canvas shapes frame |
+	canvas := RSCanvas new.
+	canvas useBlocHost.
+	frame := 0.
+		
+	shapes := #('15c108' '8d0402' '0002ab') collect: [:m |
+		RSPolygon new
+			noPaint;
+			border: (RSBorder new
+				color: ((Color colorFrom: m) alpha: 0.5);
+				width: 10;
+				yourself);
+			points: { 0@0 };
+			yourself ].
+	canvas addAll: shapes.
+	
+	canvas newAnimation repeat onStepDo: [ :transition | 
+		frame := frame + 0.02.
+		shapes doWithIndex: [ :poly :index | 
+			| points |
+			points := RSPolygon
+				generateUnitNgonPoints: 150
+				rotation: 0 
+				angle: [ :a :i | a ]
+				radius: [ :a :i | | t |
+					t := frame.
+					200 + (((a * 8) - ((index * 2 * Float pi) / 3) + t ) cos * 
+				(((1 + (a - t) cos) / 2) raisedTo: 3) * 32 ) ].
+			poly 
+				privatePoints: points;
+				resetPath
+			 ].
+			canvas signalUpdate ].
+
+	canvas 
+		when: RSExtentChangedEvent 
+		do: [ canvas camera zoomToFit: canvas extent extent: 500@500 ].
+		
+	^ canvas
+]
