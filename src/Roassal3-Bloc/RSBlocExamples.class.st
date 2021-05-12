@@ -994,3 +994,66 @@ RSBlocExamples >> example26PolygonCircleWaves [
 		
 	^ canvas
 ]
+
+{ #category : #examples }
+RSBlocExamples >> example27SteppingForceLayout [
+	<script: 'self new example27SteppingForceLayout open'>
+
+	| canvas shapes stepping edges newBox boxes createBoxes colors newLabel |
+	canvas := RSCanvas new.
+	canvas useBlocHost.
+	
+	shapes := (1 to: 50) collect: [:n | 
+		RSBox new
+			size: 30;
+			labeled;
+			model: n;
+			yourself].
+	edges := RSLineBuilder line
+		shapes: shapes;
+		connectFrom: [ :i | i // 2 ].
+	canvas
+		addAll: edges;
+		addAll: shapes.
+	stepping := RSForceLayoutStepping new.
+	stepping layout
+		length: 80;
+		charge: -300.
+	canvas @ RSCanvasController.
+	canvas @ stepping.
+	colors := RSColorPalette sequential pubu9.
+	newBox := [ :quad :index |
+		RSBox new
+			border: (RSBorder new color: Color lightGray translucent; width: 0.5);
+			extent: quad rectangle extent;
+			position: quad rectangle floatCenter;
+			color: ((colors scale: index) alpha: 0.5 );
+			yourself
+			 ]. 
+	newLabel := [ :quad :index |
+		RSLabel new
+			text: (quad charge printShowingDecimalPlaces: 1);
+			position: quad rectangle floatCenter;
+			yourself.
+		 ].
+	boxes := #().
+	createBoxes := nil.
+	createBoxes := [ :quad :lvl | | box label |
+		box := newBox value: quad value: lvl.
+		label := newLabel value: quad value: lvl.
+		quad subQuadsDo: [ :subQuad | createBoxes value: subQuad value: lvl + 1 ].
+		boxes add: box.
+		boxes add: label.
+		].
+	canvas newAnimation
+		repeat;
+		duration: 500 milliSeconds;
+		when: RSAnimationLoopEvent do: [ :v | 
+			boxes do: #remove.
+			boxes := RSGroup new.
+			createBoxes value: stepping layout currentQuadtree value: 0.
+			canvas addAll: boxes.
+			boxes pushBack ].
+
+	^ canvas
+]
