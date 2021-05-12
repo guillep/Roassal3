@@ -1057,3 +1057,48 @@ RSBlocExamples >> example27SteppingForceLayout [
 
 	^ canvas
 ]
+
+{ #category : #examples }
+RSBlocExamples >> example28RectangleForceLayout [
+	<script: 'self new example28RectangleForceLayout open'>
+
+	| canvas classes layout color |
+	canvas := RSCanvas new.
+	canvas useBlocHost.
+	
+	color := NSScale category20.
+	classes := Collection withAllSubclasses collect: [ :cls |
+		RSBox new
+			model: cls;
+			color: (color scale: cls);
+			size: 10;
+			yourself ] as: RSGroup.
+	RSLineBuilder line
+		canvas: canvas;
+		shapes: classes;
+		color: (Color blue alpha: 0.5);
+		connectFrom: #superclass to: #yourself.
+	canvas addAll: classes.
+	
+	layout := RSRectangleForceLayout new
+		nodes: classes;
+		edges: canvas edges;
+		start;
+		yourself.
+
+	self flag: #todo. "DNU without this fake initialization"
+	layout enclosingRectangle: (-100 asPoint corner: 100 asPoint).
+	canvas newAnimation repeat onStepDo: [ :t | layout step. canvas signalUpdate ].
+
+	"Apply forces from the window borders to the elements."
+	canvas when: RSExtentChangedEvent do: [ :evt |
+		| camera origin corner |
+		camera := canvas canvas camera.
+		origin := camera fromPixelToSpace: 0@0.
+		corner := camera fromPixelToSpace: canvas canvas extent.
+		layout enclosingRectangle: (origin corner: corner).
+	].
+
+	canvas camera scale: 2.
+	^ canvas
+]
