@@ -35,7 +35,8 @@ Class {
 		'animations',
 		'extent',
 		'color',
-		'morph'
+		'morph',
+		'renderCollection'
 	],
 	#pools : [
 		'AthensCairoDefinitions'
@@ -248,6 +249,11 @@ RSCanvas >> deepShapesFromModel: someObjects result: result [
 RSCanvas >> deepShapesFromModels: someObjects result: result [
 	"Private method"
 	self nodes do: [ :c | c deepShapesFromModels: someObjects result: result ]
+]
+
+{ #category : #initialization }
+RSCanvas >> defaultRenderCollection [
+	^ RSLinearRenderTree new
 ]
 
 { #category : #antialiasing }
@@ -555,6 +561,16 @@ RSCanvas >> removeShape: shape [
 	
 ]
 
+{ #category : #accessing }
+RSCanvas >> renderCollection [
+	^ renderCollection ifNil: [ renderCollection := self defaultRenderCollection ]
+]
+
+{ #category : #accessing }
+RSCanvas >> renderCollection: aRenderCollection [
+	renderCollection := aRenderCollection
+]
+
 { #category : #antialiasing }
 RSCanvas >> setAA: aNumber [
 	self propertyAt: #aa put: aNumber
@@ -573,33 +589,34 @@ RSCanvas >> setAsFixed: aShape [
 RSCanvas >> shapeWithAction: eventClass forPositionInPixels: position [
 	"position is in pixel, it corresponds to the physical location in the window.
 	e.g., 0 @ 0 is top left of the window"
-	| block |
+	| block result |
 	block := [ :list :pos| 
 		list reverseDo: [ :s | | shape |
 			shape := s shapeWithAction: eventClass forPosition: pos.
 			shape ifNotNil: [ ^ shape ] ] ].
 	block value: fixedShapes value: position.
-	block value: shapes value: (self camera fromPixelToSpace: position).
-	^ self
+	self renderCollection ifEmpty: [ renderCollection addAll: shapes ].
+	
+	"block value: shapes value: (self camera fromPixelToSpace: position)."
+	result := renderCollection shapesWithPoint: (self camera fromPixelToSpace: position).
+	result ifEmpty: [ ^ self ].
+	^ result first
 ]
 
 { #category : #'accessing - shapes' }
 RSCanvas >> shapeWithActionForPositionInPixels: position [
 	"position is in pixel, it corresponds to the physical location in the window.
 	e.g., 0 @ 0 is top left of the window"
-	| block |
+	| block result |
 	block := [ :list :pos |
 		list reverseDo: [ :s | | shape |
 			shape := s shapeWithActionForPosition: pos.
 			shape ifNotNil: [^ shape ] ] ].
 	block value: fixedShapes value: position.
-	"| shape |
-	shape := self quadTree shapeWithActionForPosition: (self camera fromPixelToSpace: position).
-	"
-	block value: shapes value: (self camera fromPixelToSpace: position).
-	"shape ifNil: [ shape := self ].
-	^ shape"
-	^ self
+	self renderCollection ifEmpty: [ renderCollection addAll: shapes ].
+	result := renderCollection shapesWithPoint: (self camera fromPixelToSpace: position).
+	result ifEmpty: [ ^ self ].
+	^ result first
 	
 ]
 

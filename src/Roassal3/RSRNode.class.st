@@ -3,7 +3,7 @@ BTree node
 "
 Class {
 	#name : #RSRNode,
-	#superclass : #RSObject,
+	#superclass : #RSAbstractRNode,
 	#instVars : [
 		'contents',
 		'left',
@@ -29,9 +29,26 @@ RSRNode >> add: anObject [
 	]ifFalse: [ | leastEnlargementChild |
 		leastEnlargementChild := self leastEnlargementChild: anObject.
 		leastEnlargementChild add: anObject.
-		self flag: 'balance'.
 	].
 	rectangle := Rectangle merging: {left rectangle. right rectangle}.
+]
+
+{ #category : #adding }
+RSRNode >> addAll: aCollection [
+	aCollection ifEmpty: [ ^ self error: 'should not' ].
+	aCollection size = 1 ifTrue: [
+		contents := aCollection first.
+		rectangle := contents encompassingRectangle.
+	] ifFalse: [ | mid col1 col2 |
+		rectangle := aCollection encompassingRectangle.
+		left := self class new.
+		mid := (aCollection size / 2) asInteger.
+		col1 := aCollection copyFrom: 1 to: mid.
+		col2 := aCollection copyFrom: mid + 1 to: aCollection size.
+		left addAll: col1.
+		right := self class new.
+		right addAll: col2.
+	]
 ]
 
 { #category : #accessing }
@@ -73,7 +90,7 @@ RSRNode >> height [
 		ifFalse: [ (left height max: right height) + 1 ]
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #inspector }
 RSRNode >> inspectionTree: aBuilder [
     <inspectorPresentationOrder: 1 title: 'Tree Structure'>
 
@@ -89,6 +106,11 @@ RSRNode >> isBalanced [
 	^ self isLeaf
 		ifTrue: [ true ]
 		ifFalse: [ (left height - right height) abs <= 1  ]
+]
+
+{ #category : #testing }
+RSRNode >> isEmpty [
+	^ false
 ]
 
 { #category : #testing }

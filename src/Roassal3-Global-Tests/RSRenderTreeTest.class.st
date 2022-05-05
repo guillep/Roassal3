@@ -1,7 +1,7 @@
 Class {
 	#name : #RSRenderTreeTest,
 	#superclass : #RSTest,
-	#category : #'Roassal3-Global-Tests-Core'
+	#category : #'Roassal3-Global-Tests-Rendering'
 }
 
 { #category : #tests }
@@ -27,6 +27,7 @@ RSRenderTreeTest >> testHeight [
 RSRenderTreeTest >> testIsBalanced [
 	| tree boxes |
 	tree := RSRenderTree new.
+	self assert: tree isBalanced.
 	boxes := (1 to: 10) collect: [ :i | RSBox new size: 10. ].
 	RSGridLayout on: boxes.
 	boxes do: [ :box | 
@@ -52,7 +53,7 @@ RSRenderTreeTest >> testOneElementContains [
 	tree := RSRenderTree new.
 	tree add: (RSBox new size: 10).
 
-	result := tree nodesWithPoint: 0@0.
+	result := tree shapesWithPoint: 0@0.
 	self assert: result notEmpty.
 	result := tree nodesIntersetcsRectangle: (0@0 corner: 100@100).
 	self assert: result notEmpty.
@@ -103,13 +104,13 @@ RSRenderTreeTest >> testThreeElementsContains [
 	b3 := RSBox new size: 10; position: -10@ -10.
 	tree addAll: { b1. b2. b3 }.
 	
-	result := tree nodesWithPoint: 0@0.
+	result := tree shapesWithPoint: 0@0.
 	self assert: result first equals: b1.
 	
-	result := tree nodesWithPoint: 30@30.
+	result := tree shapesWithPoint: 30@30.
 	self assert: result first equals: b2.
 	
-	result := tree nodesWithPoint: -10@ -10.
+	result := tree shapesWithPoint: -10@ -10.
 	self assert: result first equals: b3.
 	
 	result := tree nodesIntersetcsRectangle: (0@0 corner: 10@10).
@@ -145,10 +146,10 @@ RSRenderTreeTest >> testTwoElementsContains [
 	b1 := RSBox new size: 10.
 	b2 := RSBox new size: 30; position: 30@30.
 	tree addAll: { b1. b2 }.
-	result := tree nodesWithPoint: 0@0.
+	result := tree shapesWithPoint: 0@0.
 	self assert: result first equals: b1.
 	
-	result := tree nodesWithPoint: 30@30.
+	result := tree shapesWithPoint: 30@30.
 	self assert: result first equals: b2.
 	
 	result := tree nodesIntersetcsRectangle: (0@0 corner: 10@10).
@@ -190,7 +191,7 @@ RSRenderTreeTest >> testZeroElement [
 	| tree |
 	tree := RSRenderTree new.
 	self assert: tree isEmpty.
-	self assert: tree root isNil.
+	self assert: tree root isNilNode.
 	self assert: tree size equals: 0
 ]
 
@@ -198,7 +199,7 @@ RSRenderTreeTest >> testZeroElement [
 RSRenderTreeTest >> testZeroElementContains [
 	| tree result |
 	tree := RSRenderTree new.
-	result := tree nodesWithPoint: 0@0.
+	result := tree shapesWithPoint: 0@0.
 	self assert: result isEmpty.
 	result := tree nodesIntersetcsRectangle: (0@0 corner: 100@100).
 	self assert: result isEmpty

@@ -271,3 +271,30 @@ RSBasicAnimationExamples >> example08Markers [
 
 	^ canvas
 ]
+
+{ #category : #lines }
+RSBasicAnimationExamples >> example09BigVisualization2raised19 [
+	<script: 'self new example09BigVisualization2raised19 open'>
+	"(2 raisedTo: 19) = 524288"
+	| c b1 b2 |
+	c := RSCanvas new.
+	c renderCollection: RSExampleRenderTree new.
+	b2 := nil.
+	1 to: (2 raisedTo: 19) do: [ :i | 
+		b1 := b2.
+		b2 := RSBox new.
+		b2 model: i.
+		b2 translateTo: (i * 10) @ (i * 10).
+		b2 @ RSDraggable.
+		c add: b2.
+		"b1 ifNotNil: [ 
+			c add: (RSLine new
+				from: b1;
+				to: b2;
+				yourself) ]" ].
+	c renderCollection addAll: c nodes.
+	c @ RSDraggableCanvasInteraction new.
+	c nodes @ RSPopup.
+	c nodes @ RSHighlightable red.
+	^ c
+]

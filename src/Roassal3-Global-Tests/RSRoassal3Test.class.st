@@ -5,6 +5,25 @@ Class {
 }
 
 { #category : #tests }
+RSRoassal3Test >> testLinearRenderCollection [
+	| canvas shape box list |
+	canvas := RSCanvas new.
+	box := RSBox new size: 10.
+	canvas add: box.
+	box draggable.
+	canvas renderCollection: RSLinearRenderTree new.
+	shape := canvas shapeWithActionForPositionInPixels: canvas extent / 2.
+	self assert: shape equals: box.
+	shape := canvas shapeWithActionForPositionInPixels: 0@0.
+	self assert: shape equals: canvas.
+	
+	list := canvas renderCollection shapesWithPoint: 0@0.
+	self assert: list equals: {box}.
+	list := canvas renderCollection shapesWithPoint: 20@0.
+	self assert: list isEmpty.
+]
+
+{ #category : #tests }
 RSRoassal3Test >> testOpen [
 
 	| v |
@@ -39,6 +58,21 @@ RSRoassal3Test >> testRemoveInteractionIfPresent [
 	self assert: (box announcer handleEventClass: RSMouseMove).
 	box removeInteractionIfPresent: RSMouseMove.
 	self assert: (box announcer handleEventClass: RSMouseMove).
+]
+
+{ #category : #tests }
+RSRoassal3Test >> testRenderCollection [
+	| canvas shape list |
+	canvas := RSCanvas new.
+	canvas renderCollection: RSRenderTree new.
+	self assert: canvas renderCollection class equals: RSRenderTree.
+	shape := canvas 
+		shapeWithAction: RSPositionChangedEvent
+		forPositionInPixels: 10@10.
+	self assert: shape equals: canvas.
+	list := canvas renderCollection shapesWithPoint: 0@0.
+	self assert: list isEmpty.
+	
 ]
 
 { #category : #tests }

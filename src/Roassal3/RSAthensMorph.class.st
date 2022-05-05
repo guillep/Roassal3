@@ -345,11 +345,7 @@ RSAthensMorph >> handleMouseOver: aMorphicEvent [
 		ifTrue: [ ^ self].		"Do nothing if it is in the same position"
 	shapeBeingPointed ifNil: [
 		shapeBeingPointed := self shapeForEvent: aMorphicEvent ].
-	
-	"time := [currentElement := self shapeForEvent: aMorphicEvent] timeToRun.
-	times := roassalCanvas propertyAt: #times ifAbsentPut: [ OrderedCollection new ].
-	times add: time.
-	times average traceCr."
+	Transcript show: 1.
 	currentElement := self shapeForEvent: aMorphicEvent.
 	lastMousePosition := aMorphicEvent position.
 	currentElement == shapeBeingPointed 
