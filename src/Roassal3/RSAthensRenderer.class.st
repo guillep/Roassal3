@@ -629,6 +629,7 @@ RSAthensRenderer >> visitCamera: camera [
 
 { #category : #visiting }
 RSAthensRenderer >> visitCanvas: aRSCanvas [
+	| shapes |
 	matrix := AthensAffineTransform new.
 	originMatrix := matrix copy.
 	canvasRect := aRSCanvas visibleRectangle.
@@ -638,7 +639,9 @@ RSAthensRenderer >> visitCanvas: aRSCanvas [
 	"athensCanvas setTolerance: 7."
 	
 	aRSCanvas camera accept: self.
-	aRSCanvas shapes accept: self.
+	shapes := aRSCanvas renderCollection nodesIntersetcsRectangle: canvasRect.
+	shapes do: [ :s | s accept: self ].
+	"aRSCanvas shapes accept: self."
 	
 	"We display the elements that are _NOT_ subject to the camera"
 	matrix loadIdentity.

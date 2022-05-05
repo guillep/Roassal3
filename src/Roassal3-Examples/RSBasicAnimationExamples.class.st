@@ -278,6 +278,7 @@ RSBasicAnimationExamples >> example09BigVisualization2raised19 [
 	"(2 raisedTo: 19) = 524288"
 	| c b1 b2 |
 	c := RSCanvas new.
+	c aaNone.
 	c renderCollection: RSExampleRenderTree new.
 	b2 := nil.
 	1 to: (2 raisedTo: 19) do: [ :i | 
